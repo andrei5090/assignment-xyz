@@ -1,0 +1,119 @@
+package com.xyzbank.digital_onboarding_api.models;
+
+import com.xyzbank.digital_onboarding_api.enums.AccountType;
+import com.xyzbank.digital_onboarding_api.enums.Country;
+import com.xyzbank.digital_onboarding_api.enums.Currency;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class AccountTest {
+
+    private Validator validator;
+    private Account account;
+
+    static Stream<String> validIbans() {
+        return Stream.of(
+            "NL91ABNA0417164300",
+            "BE68539007547034", 
+            "NL12RABO0123456789",
+            "BE71096123456769"
+        );
+    }
+
+    static Stream<String> invalidIbans() {
+        return Stream.of(
+            null,
+            "",
+            "INVALID",
+            "DE68539007547034",  // Unsupported country
+            "NL91ABNA041716430",  // Too short
+            "BE6853900754703A"    // Invalid character
+        );
+    }
+
+    @BeforeEach
+    void setUp() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+        
+        Customer customer = new Customer(
+            "Andrei",
+            "123 Street, City",
+            "andrei123",
+            LocalDate.of(1990, 1, 1),
+            Country.NL,
+            "password123"
+        );
+        
+        account = new Account(
+            "NL91ABNA0417164300",
+            new BigDecimal("1000.00"),
+            AccountType.CHECKING,
+            Currency.EUR,
+            customer
+        );
+    }
+
+    @Test
+    void testValidAccount() {
+        Set<ConstraintViolation<Account>> violations = validator.validate(account);
+        assertTrue(violations.isEmpty());
+    }
+
+    @ParameterizedTest
+    @MethodSource("validIbans")
+    void testValidIbans(String iban) {
+        account.setIban(iban);
+        Set<ConstraintViolation<Account>> violations = validator.validate(account);
+        assertTrue(violations.isEmpty());
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidIbans")
+    void testInvalidIbans(String iban) {
+        account.setIban(iban);
+        Set<ConstraintViolation<Account>> violations = validator.validate(account);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void testNegativeBalance() {
+        account.setBalance(new BigDecimal("-100.00"));
+        Set<ConstraintViolation<Account>> violations = validator.validate(account);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void testNullBalance() {
+        account.setBalance(null);
+        Set<ConstraintViolation<Account>> violations = validator.validate(account);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void testNullAccountType() {
+        account.setAccountType(null);
+        Set<ConstraintViolation<Account>> violations = validator.validate(account);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void testNullCurrency() {
+        account.setCurrency(null);
+        Set<ConstraintViolation<Account>> violations = validator.validate(account);
+        assertFalse(violations.isEmpty());
+    }
+}
