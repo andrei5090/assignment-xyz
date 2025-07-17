@@ -6,7 +6,6 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 import java.lang.annotation.*;
 import java.time.LocalDate;
-import java.time.Period;
 
 @Constraint(validatedBy = MinAge.MinAgeValidator.class)
 @Target(ElementType.FIELD)
@@ -32,10 +31,8 @@ public @interface MinAge {
                 return false;
             }
             
-            LocalDate now = LocalDate.now();
-            Period age = Period.between(dateOfBirth, now);
-            
-            return age.getYears() >= minAge;
+            LocalDate minAgeDate = dateOfBirth.plusYears(minAge);
+            return !minAgeDate.isAfter(LocalDate.now());
         }
     }
 }
