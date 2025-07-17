@@ -7,15 +7,15 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
-@Constraint(validatedBy = ValidIban.IbanValidator.class)
+@Constraint(validatedBy = ValidIBAN.IbanValidator.class)
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidIban {
+public @interface ValidIBAN {
     String message() default "Invalid IBAN format";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 
-    class IbanValidator implements ConstraintValidator<ValidIban, String> {
+    class IbanValidator implements ConstraintValidator<ValidIBAN, String> {
         
         @Override
         public boolean isValid(String iban, ConstraintValidatorContext context) {

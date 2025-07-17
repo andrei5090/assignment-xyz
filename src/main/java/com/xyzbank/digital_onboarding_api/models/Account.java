@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import com.xyzbank.digital_onboarding_api.enums.AccountType;
 import com.xyzbank.digital_onboarding_api.enums.Currency;
-import com.xyzbank.digital_onboarding_api.validation.ValidIban;
+import com.xyzbank.digital_onboarding_api.validation.ValidIBAN;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -24,7 +24,7 @@ public class Account {
     private Long id;
     
     @NotBlank(message = "IBAN is required")
-    @ValidIban
+    @ValidIBAN
     @Column(nullable = false, unique = true)
     private String iban;
     
