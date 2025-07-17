@@ -3,6 +3,7 @@ package com.xyzbank.digital_onboarding_api.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import com.xyzbank.digital_onboarding_api.enums.Country;
+import com.xyzbank.digital_onboarding_api.validation.MinAge;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -39,6 +40,7 @@ public class Customer {
     
     @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
+    @MinAge(18)
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
     

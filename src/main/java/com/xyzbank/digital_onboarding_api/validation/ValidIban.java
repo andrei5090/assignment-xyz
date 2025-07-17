@@ -15,7 +15,7 @@ public @interface ValidIban {
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 
-    public static class IbanValidator implements ConstraintValidator<ValidIban, String> {
+    class IbanValidator implements ConstraintValidator<ValidIban, String> {
         
         @Override
         public boolean isValid(String iban, ConstraintValidatorContext context) {
