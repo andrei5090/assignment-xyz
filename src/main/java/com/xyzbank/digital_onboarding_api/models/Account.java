@@ -41,7 +41,7 @@ public class Account {
     @NotNull(message = "Currency is required")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Currency currency;
+    private Currency currency = Currency.EUR;
     
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
