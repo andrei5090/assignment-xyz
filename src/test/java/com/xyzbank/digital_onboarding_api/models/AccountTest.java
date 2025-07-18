@@ -49,22 +49,20 @@ class AccountTest {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
         
-        Customer customer = new Customer(
-            "Andrei",
-            "123 Street, City",
-            "andrei123",
-            LocalDate.of(1990, 1, 1),
-            Country.NL,
-            "password123"
-        );
+        Customer customer = new Customer();
+        customer.setName("Andrei");
+        customer.setAddress("123 Street, City");
+        customer.setUsername("andrei123");
+        customer.setDateOfBirth(LocalDate.of(1990, 1, 1));
+        customer.setCountry(Country.NL);
+        customer.setPassword("password123");
         
-        account = new Account(
-            "NL91ABNA0417164300",
-            new BigDecimal("1000.00"),
-            AccountType.CHECKING,
-            Currency.EUR,
-            customer
-        );
+        account = new Account();
+        account.setIban("NL91ABNA0417164300");
+        account.setBalance(new BigDecimal("1000.00"));
+        account.setAccountType(AccountType.CHECKING);
+        account.setCurrency(Currency.EUR);
+        account.setCustomer(customer);
     }
 
     @Test

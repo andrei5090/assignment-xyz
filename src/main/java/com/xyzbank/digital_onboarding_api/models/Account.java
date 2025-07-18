@@ -53,15 +53,6 @@ public class Account {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
     
-    public Account(String iban, BigDecimal balance, AccountType accountType, Currency currency, Customer customer) {
-        this.iban = iban;
-        this.balance = balance;
-        this.accountType = accountType;
-        this.currency = currency;
-        this.customer = customer;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
     
     @PrePersist
     public void prePersist() {

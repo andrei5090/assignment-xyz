@@ -70,14 +70,13 @@ class CustomerTest {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
 
-        customer = new Customer(
-                "Andrei",
-                "123 Street, City",
-                "andrei123",
-                LocalDate.of(1990, 1, 1),
-                Country.NL,
-                "password123"
-        );
+        customer = new Customer();
+        customer.setName("Andrei");
+        customer.setAddress("123 Street, City");
+        customer.setUsername("andrei123");
+        customer.setDateOfBirth(LocalDate.of(1990, 1, 1));
+        customer.setCountry(Country.NL);
+        customer.setPassword("password123");
     }
 
     @Test

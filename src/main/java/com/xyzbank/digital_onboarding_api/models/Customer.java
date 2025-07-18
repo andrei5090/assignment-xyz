@@ -57,15 +57,6 @@ public class Customer {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Account> accounts = new ArrayList<>();
     
-    public Customer(String name, String address, String username, LocalDate dateOfBirth, Country country, String password) {
-        this.name = name;
-        this.address = address;
-        this.username = username;
-        this.dateOfBirth = dateOfBirth;
-        this.country = country;
-        this.password = password;
-        this.accounts = new ArrayList<>();
-    }
     
     public void addAccount(Account account) {
         accounts.add(account);
