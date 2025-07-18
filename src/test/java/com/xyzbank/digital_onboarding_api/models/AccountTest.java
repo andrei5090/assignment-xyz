@@ -28,7 +28,7 @@ class AccountTest {
         return Stream.of(
             "NL91ABNA0417164300",
             "BE68539007547034", 
-            "NL12RABO0123456789",
+            "NL39RABO0300065264",
             "BE71096123456769"
         );
     }
