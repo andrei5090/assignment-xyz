@@ -13,19 +13,19 @@ class CountryTest {
     // Test data
     static Stream<String> validIbans() {
         return Stream.of(
-            "NL91ABNA0417164300",
-            "BE68539007547034", 
-            "NL12RABO0123456789",
-            "BE71096123456769"
+                "NL91ABNA0417164300",
+                "BE68539007547034",
+                "NL12RABO0123456789",
+                "BE71096123456769"
         );
     }
 
     static Stream<String> invalidIbans() {
         return Stream.of(
-            "NL91ABNA041716430",  // Too short
-            "BE6853900754703",    // Too short  
-            "NL91abna0417164300", // Lowercase
-            "BE6853900754703A"    // Invalid character
+                "NL91ABNA041716430",  // Too short
+                "BE6853900754703",    // Too short
+                "NL91abna0417164300", // Lowercase
+                "BE6853900754703A"    // Invalid character
         );
     }
 

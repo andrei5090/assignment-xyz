@@ -18,48 +18,47 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @ToString(exclude = "customer")
 public class Account {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @NotBlank(message = "IBAN is required")
+
     @ValidIBAN
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String iban;
-    
+
     @NotNull(message = "Balance is required")
     @DecimalMin(value = "0.0", inclusive = true, message = "Balance cannot be negative")
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal balance;
-    
+
     @NotNull(message = "Account type is required")
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type", nullable = false)
     private AccountType accountType;
-    
+
     @NotNull(message = "Currency is required")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Currency currency = Currency.EUR;
-    
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
-    
-    
+
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
-    
+
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();

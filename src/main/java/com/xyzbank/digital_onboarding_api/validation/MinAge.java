@@ -4,6 +4,7 @@ import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
+
 import java.lang.annotation.*;
 import java.time.LocalDate;
 
@@ -12,25 +13,28 @@ import java.time.LocalDate;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MinAge {
     String message() default "Customer must be at least {value} years old";
+
     int value() default 18;
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 
     class MinAgeValidator implements ConstraintValidator<MinAge, LocalDate> {
-        
+
         private int minAge;
-        
+
         @Override
         public void initialize(MinAge constraintAnnotation) {
             this.minAge = constraintAnnotation.value();
         }
-        
+
         @Override
         public boolean isValid(LocalDate dateOfBirth, ConstraintValidatorContext context) {
             if (dateOfBirth == null) {
                 return false;
             }
-            
+
             LocalDate minAgeDate = dateOfBirth.plusYears(minAge);
             return !minAgeDate.isAfter(LocalDate.now());
         }
