@@ -6,6 +6,7 @@ import com.xyzbank.digital_onboarding_api.models.Account;
 import com.xyzbank.digital_onboarding_api.models.Customer;
 import com.xyzbank.digital_onboarding_api.util.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,9 @@ public class RegistrationService {
     @Autowired
     private PasswordGenerator passwordGenerator;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Transactional
     public RegistrationResponse registerCustomer(RegistrationRequest request) {
         if (customerService.isUsernameExists(request.username())) {
@@ -28,6 +32,7 @@ public class RegistrationService {
         }
 
         String password = passwordGenerator.generatePassword();
+        String hashedPassword = passwordEncoder.encode(password);
 
         Customer customer = new Customer();
         customer.setName(request.name());
@@ -35,7 +40,7 @@ public class RegistrationService {
         customer.setUsername(request.username());
         customer.setDateOfBirth(request.dateOfBirth());
         customer.setCountry(request.country());
-        customer.setPassword(password);
+        customer.setPassword(hashedPassword);
 
         Customer savedCustomer = customerService.saveCustomer(customer);
 

@@ -14,10 +14,13 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 
 @RestController
 @RequestMapping("/api")
@@ -35,13 +38,24 @@ public class RegistrationController {
                     description = "Customer successfully registered",
                     content = @Content(schema = @Schema(implementation = RegistrationResponse.class))),
             @ApiResponse(responseCode = "400",
-                    description = "Invalid input data or business rule violation",
+                    description = "Invalid input data or validation erro",
                     content = @Content(schema = @Schema(implementation = RegistrationResponse.class))),
             @ApiResponse(responseCode = "500",
                     description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = RegistrationResponse.class)))
     })
-    public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody RegistrationRequest request) {
+    public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody RegistrationRequest request, BindingResult bindingResult) {
+        System.out.println("Registration endpoint hit with: " + request);
+
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getDefaultMessage())
+                    .findFirst()
+                    .orElse("Validation failed");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(RegistrationResponse.failure(errorMessage));
+        }
+
         try {
             RegistrationResponse response = registrationService.registerCustomer(request);
 
@@ -58,5 +72,16 @@ public class RegistrationController {
             RegistrationResponse errorResponse = RegistrationResponse.failure(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
+    }
+
+    // workaround to display enum (json error parsing) since the bindingResult cannot handle it.
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<RegistrationResponse> handleJsonParseError(HttpMessageNotReadableException ex) {
+        String message = "Invalid data format";
+        if (ex.getMessage().contains("Country")) {
+            message = "Invalid country. Only NL and BE are allowed";
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(RegistrationResponse.failure(message));
     }
 }

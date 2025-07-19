@@ -27,7 +27,7 @@ public record RegistrationRequest(
         @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
         String username,
 
-        @Schema(description = "Customer date of birth (must be 18+ years old)", example = "1990-01-01")
+        @Schema(description = "Customer date of birth (must be 18+ years old)", example = "1990-03-15")
         @NotNull(message = "Date of birth is required")
         @Past(message = "Date of birth must be in the past")
         @MinAge(18)

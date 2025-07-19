@@ -11,13 +11,16 @@ public record LoginResponse(
         String message,
 
         @Schema(description = "Customer username (if successful)", example = "andrei123")
-        String username
+        String username,
+
+        @Schema(description = "JWT authentication token (if successful)", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+        String token
 ) {
-    public static LoginResponse success(String username) {
-        return new LoginResponse(true, "Login successful", username);
+    public static LoginResponse success(String username, String token) {
+        return new LoginResponse(true, "Login successful", username, token);
     }
 
     public static LoginResponse failure(String message) {
-        return new LoginResponse(false, message, null);
+        return new LoginResponse(false, message, null, null);
     }
 }

@@ -9,7 +9,7 @@ public record LoginRequest(
         @NotBlank(message = "Username is required")
         String username,
 
-        @Schema(description = "Customer password", example = "generated123")
+        @Schema(description = "Customer password", example = "password123")
         @NotBlank(message = "Password is required")
         String password
 ) {

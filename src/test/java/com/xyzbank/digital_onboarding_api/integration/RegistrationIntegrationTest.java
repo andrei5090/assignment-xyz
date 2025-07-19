@@ -17,6 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.ActiveProfiles;
@@ -43,6 +44,9 @@ class RegistrationIntegrationTest {
     @Autowired
     private CustomerService customerService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -59,12 +63,10 @@ class RegistrationIntegrationTest {
     }
 
     private void verifyCompleteRegistration(RegistrationRequest request, RegistrationResponse response) {
-        // verify response data matches request
         assertEquals(request.username(), response.username());
         assertNotNull(response.password());
         assertEquals("Registration successful", response.message());
 
-        // verify customer data in database
         Optional<Customer> customerOpt = customerService.findByUsername(request.username());
         assertTrue(customerOpt.isPresent());
         Customer customer = customerOpt.get();
@@ -74,9 +76,8 @@ class RegistrationIntegrationTest {
         assertEquals(request.username(), customer.getUsername());
         assertEquals(request.dateOfBirth(), customer.getDateOfBirth());
         assertEquals(request.country(), customer.getCountry());
-        assertEquals(response.password(), customer.getPassword());
+        assertTrue(passwordEncoder.matches(response.password(), customer.getPassword()));
 
-        // verify account creation
         assertNotNull(customer.getAccounts());
         assertEquals(1, customer.getAccounts().size());
         Account account = customer.getAccounts().getFirst();
