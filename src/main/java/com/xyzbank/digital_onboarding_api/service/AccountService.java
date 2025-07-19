@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 public class AccountService {
@@ -41,9 +40,5 @@ public class AccountService {
         // since the validation is true when the iban is null, we check if the iban rn is not empty and not null
         // triggering full validation -> the exception will rollback all the changes
         return accountRepository.save(account);
-    }
-
-    public List<Account> getAccountsByCustomer(Customer customer) {
-        return accountRepository.findByCustomer(customer);
     }
 }
