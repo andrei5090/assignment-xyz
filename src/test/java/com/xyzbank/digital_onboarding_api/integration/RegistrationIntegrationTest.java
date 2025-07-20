@@ -7,14 +7,16 @@ import com.xyzbank.digital_onboarding_api.enums.Country;
 import com.xyzbank.digital_onboarding_api.service.CustomerService;
 import com.xyzbank.digital_onboarding_api.models.Customer;
 import com.xyzbank.digital_onboarding_api.models.Account;
+import com.xyzbank.digital_onboarding_api.utils.IntegrationTestUtils;
 
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.junit.jupiter.api.BeforeEach;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,20 +25,20 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
 class RegistrationIntegrationTest {
 
-    private MockMvc mockMvc;
-
     @Autowired
-    private WebApplicationContext webApplicationContext;
+    private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -47,104 +49,57 @@ class RegistrationIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
-
-    private RegistrationResponse performRegistration(RegistrationRequest request) throws Exception {
-        String responseJson = mockMvc.perform(post("/api/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
-
-        return objectMapper.readValue(responseJson, RegistrationResponse.class);
-    }
-
-    private void verifyCompleteRegistration(RegistrationRequest request, RegistrationResponse response) {
-        assertEquals(request.username(), response.username());
-        assertNotNull(response.password());
-        assertEquals("Registration successful", response.message());
-
-        Optional<Customer> customerOpt = customerService.findByUsername(request.username());
-        assertTrue(customerOpt.isPresent());
-        Customer customer = customerOpt.get();
-
-        assertEquals(request.name(), customer.getName());
-        assertEquals(request.address(), customer.getAddress());
-        assertEquals(request.username(), customer.getUsername());
-        assertEquals(request.dateOfBirth(), customer.getDateOfBirth());
-        assertEquals(request.country(), customer.getCountry());
-        assertTrue(passwordEncoder.matches(response.password(), customer.getPassword()));
-
-        assertNotNull(customer.getAccounts());
-        assertEquals(1, customer.getAccounts().size());
-        Account account = customer.getAccounts().getFirst();
-        assertNotNull(account.getIban());
-        assertTrue(account.getIban().startsWith("NL"));
-        assertEquals(customer, account.getCustomer());
-    }
 
     private void verifyNoDataCreated(String username) {
         Optional<Customer> customerOpt = customerService.findByUsername(username);
         assertFalse(customerOpt.isPresent(), "No customer should have been created");
     }
 
-    @Test
-    void shouldRegisterValidCustomer() throws Exception {
-        RegistrationRequest request = new RegistrationRequest(
-                "Andrei Popescu", "Amsterdam", "andrei123",
-                LocalDate.of(1990, 1, 1), Country.NL);
+    static Stream<Arguments> validCustomers() {
+        return IntegrationTestUtils.validCustomers();
+    }
 
-        RegistrationResponse response = performRegistration(request);
-        verifyCompleteRegistration(request, response);
+    static Stream<Arguments> invalidAgeCustomers() {
+        return IntegrationTestUtils.invalidAgeCustomers();
+    }
+
+    @ParameterizedTest
+    @MethodSource("validCustomers")
+    void shouldRegisterValidCustomers(String name, String address, String username, LocalDate dateOfBirth, Country country) throws Exception {
+        RegistrationResponse response = IntegrationTestUtils.registerCustomer(
+                mockMvc, objectMapper, name, address, username, dateOfBirth, country);
+
+        assertEquals(username, response.username());
+        assertNotNull(response.password());
+        assertEquals("Registration successful", response.message());
+
+        Optional<Customer> customerOpt = customerService.findByUsername(username);
+        assertTrue(customerOpt.isPresent());
+        Customer customer = customerOpt.get();
+
+        assertEquals(name, customer.getName());
+        assertEquals(username, customer.getUsername());
+        assertEquals(country, customer.getCountry());
+
+        assertNotNull(customer.getAccounts());
+        assertEquals(1, customer.getAccounts().size());
+        assertTrue(customer.getAccounts().getFirst().getIban().startsWith("NL"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidAgeCustomers")
+    void shouldRejectUnderageCustomers(String name, String address, String username, LocalDate dateOfBirth, Country country) throws Exception {
+        IntegrationTestUtils.expectRegistrationFailure(mockMvc, objectMapper, name, address, username, dateOfBirth, country);
+        verifyNoDataCreated(username);
     }
 
     @Test
     void shouldRejectDuplicateUsername() throws Exception {
-        RegistrationRequest request = new RegistrationRequest(
-                "Maria Ionescu", "Rotterdam", "maria_test",
-                LocalDate.of(1985, 5, 15), Country.NL);
+        IntegrationTestUtils.registerCustomer(mockMvc, objectMapper, 
+                "Unique User", "Utrecht", "unique_duplicate_test", LocalDate.of(1985, 5, 15), Country.NL);
 
-        mockMvc.perform(post("/api/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
-
-        String responseJson = mockMvc.perform(post("/api/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andReturn().getResponse().getContentAsString();
-
-        RegistrationResponse response = objectMapper.readValue(responseJson, RegistrationResponse.class);
-        assertNull(response.username());
-        assertTrue(response.message().contains("Username already exists"));
-    }
-
-    @Test
-    void shouldRejectUnderageCustomer() throws Exception {
-        RegistrationRequest request = new RegistrationRequest(
-                "Alex Minor", "Utrecht", "alex_young",
-                LocalDate.now().minusYears(17), Country.NL);
-
-        mockMvc.perform(post("/api/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
-
-        verifyNoDataCreated("alex_young");
-    }
-
-    @Test
-    void shouldAcceptCustomerExactly18Years() throws Exception {
-        RegistrationRequest request = new RegistrationRequest(
-                "Stefan Mihai", "The Hague", "stefan18",
-                LocalDate.now().minusYears(18), Country.NL);
-
-        RegistrationResponse response = performRegistration(request);
-        verifyCompleteRegistration(request, response);
+        IntegrationTestUtils.expectRegistrationFailure(mockMvc, objectMapper,
+                "Different Person", "Different Address", "unique_duplicate_test", LocalDate.of(1990, 1, 1), Country.NL);
     }
 
     @Test
@@ -168,13 +123,4 @@ class RegistrationIntegrationTest {
         verifyNoDataCreated("pierre_paris");
     }
 
-    @Test
-    void shouldAcceptBelgianCustomer() throws Exception {
-        RegistrationRequest request = new RegistrationRequest(
-                "Luc Van Belgium", "Brussels", "luc_belgium",
-                LocalDate.of(1980, 12, 25), Country.BE);
-
-        RegistrationResponse response = performRegistration(request);
-        verifyCompleteRegistration(request, response);
-    }
 }
