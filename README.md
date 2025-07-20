@@ -1,4 +1,4 @@
-# Andrei's XYZ Bank - How to Use
+# Andrei's Bank - How to Use
 
 Spring Boot REST API for customer registration and account opening. Supports NL/BE customers with automatic IBAN
 generation and JWT authentication.
