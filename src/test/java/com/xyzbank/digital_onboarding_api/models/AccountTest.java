@@ -3,6 +3,7 @@ package com.xyzbank.digital_onboarding_api.models;
 import com.xyzbank.digital_onboarding_api.enums.AccountType;
 import com.xyzbank.digital_onboarding_api.enums.Country;
 import com.xyzbank.digital_onboarding_api.enums.Currency;
+import com.xyzbank.digital_onboarding_api.util.IbanGenerator;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -23,6 +24,7 @@ class AccountTest {
 
     private Validator validator;
     private Account account;
+    private IbanGenerator ibanGenerator;
 
     static Stream<String> validIbans() {
         return Stream.of(
@@ -47,6 +49,7 @@ class AccountTest {
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+        ibanGenerator = new IbanGenerator();
 
         Customer customer = new Customer();
         customer.setName("Andrei");
@@ -121,5 +124,16 @@ class AccountTest {
         account.setCurrency(null);
         Set<ConstraintViolation<Account>> violations = validator.validate(account);
         assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void testIbanGeneration() {
+        Long accountId = 123456L;
+        String generatedIban = ibanGenerator.generateNLIban(accountId);
+        
+        assertNotNull(generatedIban);
+        assertTrue(generatedIban.startsWith("NL"));
+        assertEquals(18, generatedIban.length());
+        assertTrue(generatedIban.contains("ANDR"));
     }
 }

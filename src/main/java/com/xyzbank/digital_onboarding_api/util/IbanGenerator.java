@@ -25,37 +25,6 @@ public class IbanGenerator {
         return COUNTRY_CODE + checkDigits + BANK_CODE + accountNumber;
     }
 
-    public boolean validateIban(String iban) {
-        if (iban == null || iban.trim().isEmpty()) {
-            return false;
-        }
-
-        String cleanIban = iban.replaceAll("\\s+", "").trim();
-
-        if (cleanIban.length() < 4) {
-            return false;
-        }
-
-        // Move first 4 characters to end
-        String rearranged = cleanIban.substring(4) + cleanIban.substring(0, 4);
-
-        // Replace letters with numbers (A=10, B=11, ..., Z=35)
-        StringBuilder numericString = new StringBuilder();
-        for (char c : rearranged.toCharArray()) {
-            if (Character.isLetter(c)) {
-                // Convert A=10, B=11, ..., Z=35
-                int value = Character.toUpperCase(c) - 'A' + 10;
-                numericString.append(value);
-            } else {
-                numericString.append(c);
-            }
-        }
-
-        // Calculate mod 97 - should equal 1 for valid IBAN
-        int remainder = mod97(numericString.toString());
-        return remainder == 1;
-    }
-
     // follows the wikipedia Algorithms/Validating the IBAN
     // https://en.wikipedia.org/wiki/International_Bank_Account_Number
     private String calculateCheckDigits(String iban) {
