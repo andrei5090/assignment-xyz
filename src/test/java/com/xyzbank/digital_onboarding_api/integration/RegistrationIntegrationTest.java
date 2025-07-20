@@ -95,7 +95,7 @@ class RegistrationIntegrationTest {
 
     @Test
     void shouldRejectDuplicateUsername() throws Exception {
-        IntegrationTestUtils.registerCustomer(mockMvc, objectMapper, 
+        IntegrationTestUtils.registerCustomer(mockMvc, objectMapper,
                 "Unique User", "Utrecht", "unique_duplicate_test", LocalDate.of(1985, 5, 15), Country.NL);
 
         IntegrationTestUtils.expectRegistrationFailure(mockMvc, objectMapper,

@@ -9,8 +9,8 @@ import org.springframework.cache.annotation.EnableCaching;
 // TODO: consider TTL
 public class DigitalCustomerOnboardingApiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(DigitalCustomerOnboardingApiApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(DigitalCustomerOnboardingApiApplication.class, args);
+    }
 
 }

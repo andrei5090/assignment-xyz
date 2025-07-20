@@ -130,7 +130,7 @@ class AccountTest {
     void testIbanGeneration() {
         Long accountId = 123456L;
         String generatedIban = ibanGenerator.generateNLIban(accountId);
-        
+
         assertNotNull(generatedIban);
         assertTrue(generatedIban.startsWith("NL"));
         assertEquals(18, generatedIban.length());

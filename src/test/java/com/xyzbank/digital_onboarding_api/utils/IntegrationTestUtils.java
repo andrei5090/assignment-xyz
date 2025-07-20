@@ -19,8 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class IntegrationTestUtils {
 
-    public static RegistrationResponse registerCustomer(MockMvc mockMvc, ObjectMapper objectMapper, 
-                                                      String name, String address, String username, LocalDate dateOfBirth, Country country) throws Exception {
+    public static RegistrationResponse registerCustomer(MockMvc mockMvc, ObjectMapper objectMapper,
+                                                        String name, String address, String username, LocalDate dateOfBirth, Country country) throws Exception {
         RegistrationRequest regRequest = new RegistrationRequest(name, address, username, dateOfBirth, country);
 
         String regResponse = mockMvc.perform(post("/api/register")
@@ -35,8 +35,8 @@ public class IntegrationTestUtils {
         return registration;
     }
 
-    public static LoginResponse loginCustomer(MockMvc mockMvc, ObjectMapper objectMapper, 
-                                            String username, String password) throws Exception {
+    public static LoginResponse loginCustomer(MockMvc mockMvc, ObjectMapper objectMapper,
+                                              String username, String password) throws Exception {
         LoginRequest loginRequest = new LoginRequest(username, password);
 
         String loginResponse = mockMvc.perform(post("/api/login")
@@ -52,7 +52,7 @@ public class IntegrationTestUtils {
     }
 
     public static void expectRegistrationFailure(MockMvc mockMvc, ObjectMapper objectMapper,
-                                                String name, String address, String username, LocalDate dateOfBirth, Country country) throws Exception {
+                                                 String name, String address, String username, LocalDate dateOfBirth, Country country) throws Exception {
         RegistrationRequest regRequest = new RegistrationRequest(name, address, username, dateOfBirth, country);
 
         mockMvc.perform(post("/api/register")
@@ -62,7 +62,7 @@ public class IntegrationTestUtils {
     }
 
     public static LoginResponse registerAndLogin(MockMvc mockMvc, ObjectMapper objectMapper,
-                                               String name, String address, String username, LocalDate dateOfBirth, Country country) throws Exception {
+                                                 String name, String address, String username, LocalDate dateOfBirth, Country country) throws Exception {
         RegistrationResponse registration = registerCustomer(mockMvc, objectMapper, name, address, username, dateOfBirth, country);
         return loginCustomer(mockMvc, objectMapper, registration.username(), registration.password());
     }

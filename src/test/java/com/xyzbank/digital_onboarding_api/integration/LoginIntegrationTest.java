@@ -44,18 +44,18 @@ class LoginIntegrationTest {
     @MethodSource("loginTestData")
     void testLogin(String username, boolean expectToken, int expectedStatus) throws Exception {
         RegistrationResponse registration = IntegrationTestUtils.registerCustomer(
-                mockMvc, objectMapper, "Andrei Popescu", "Amsterdam", "andrei123", 
+                mockMvc, objectMapper, "Andrei Popescu", "Amsterdam", "andrei123",
                 LocalDate.of(1990, 1, 1), Country.NL);
 
-        LoginRequest loginRequest = new LoginRequest(username, 
+        LoginRequest loginRequest = new LoginRequest(username,
                 username.equals("andrei123") ? registration.password() : "wrongpass");
-        
+
         String loginResponse = mockMvc.perform(post("/api/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().is(expectedStatus))
                 .andReturn().getResponse().getContentAsString();
-        
+
         LoginResponse login = objectMapper.readValue(loginResponse, LoginResponse.class);
         assertEquals(expectToken, login.token() != null);
     }

@@ -42,7 +42,7 @@ public class LoginController {
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         try {
             LoginResponse response = loginService.authenticateCustomer(request);
-            
+
             if (response.success()) {
                 return ResponseEntity.ok(response);
             } else {

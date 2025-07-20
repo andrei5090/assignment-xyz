@@ -15,7 +15,7 @@ public class OverviewService {
 
     @Autowired
     private CustomerService customerService;
-    
+
     @Autowired
     private AccountRepository accountRepository;
 
@@ -26,7 +26,7 @@ public class OverviewService {
 
         List<Account> accounts = accountRepository.findByCustomer(customer);
         Account account = accounts.getFirst();
-        
+
         return new OverviewResponse(
                 account.getIban(),
                 account.getAccountType().toString(),
