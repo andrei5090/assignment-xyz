@@ -46,7 +46,7 @@ public class RegistrationController {
     })
     public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody RegistrationRequest request, BindingResult bindingResult) {
 
-        // if the body is invalid send the error message
+        // if the body is invalid send the first error message
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getFieldErrors().stream()
                     .map(error -> error.getDefaultMessage())
