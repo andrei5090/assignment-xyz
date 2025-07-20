@@ -1,10 +1,12 @@
 # Andrei's XYZ Bank - How to Use
 
-Spring Boot REST API for customer registration and account opening. Supports NL/BE customers with automatic IBAN generation and JWT authentication.
+Spring Boot REST API for customer registration and account opening. Supports NL/BE customers with automatic IBAN
+generation and JWT authentication.
 
 ## Quick Start
 
-**Recommended:** Use Docker
+**Recommended:** Use Docker as described under *Testing*, or you can start the app quickly using the command below and
+follow the same instructions (please note that the docker run will have a persistent db):
 
 ```bash
 ./gradlew bootRun
@@ -26,6 +28,7 @@ Application runs on `http://localhost:8080`
 
 1. Ensure you have Docker installed
 2. Build and start with Docker Compose (builds app + creates MySQL DB):
+
 ```bash
 docker-compose up
 ```
@@ -35,28 +38,33 @@ docker-compose up
 4. Test with Postman collection
 
 **Postman Collection:**
+
 - Local file: `assignment-xyz.postman_collection.json`
 - Online: [Postman Workspace](https://web.postman.co/workspace/My-Workspace~fe2e9855-d084-4940-82b7-5bc8edb73140/collection/10600480-c54c58d2-8e4c-4e66-a5df-e2e69030bf14?action=share&source=copy-link&creator=10600480)
 
 **How to use Postman Collection:**
 
-Import the collection "Andrei's XYZ bank requests" in Postman by using the link above, or importing the JSON file from this repository. Then follow this workflow:
+Import the collection "Andrei's XYZ bank requests" in Postman by using the link above, or importing the JSON file from
+this repository. Then follow this workflow:
 
 1. **Register a user** - Use any register request to create a new customer (user data under the JSON body)
-2. **Login** - Use the generated password from registration response to login with the same username as the registration (user data under the JSON body)
-3. **Access overview** - Copy the JWT token from successful login response (if login is successful) to access the overview method by pasting the JWT token under Authorization → Bearer Token
+2. **Login** - Use the generated password from registration response to login with the same username as the
+   registration (user data under the JSON body)
+3. **Access overview** - Copy the JWT token from successful login response (if login is successful) to access the
+   overview method by pasting the JWT token under Authorization → Bearer Token
 
 **API Endpoints:**
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/register` | Register new customer |
-| POST | `/api/login` | Customer authentication |
-| GET | `/api/overview` | Account details (requires JWT) |
+| Method | Path            | Description                    |
+|--------|-----------------|--------------------------------|
+| POST   | `/api/register` | Register new customer          |
+| POST   | `/api/login`    | Customer authentication        |
+| GET    | `/api/overview` | Account details (requires JWT) |
 
 **Example Requests:**
 
 Registration - `POST http://localhost:8080/api/register`:
+
 ```json
 {
   "name": "Andrei Popescu",
@@ -68,6 +76,7 @@ Registration - `POST http://localhost:8080/api/register`:
 ```
 
 Login - `POST http://localhost:8080/api/login`:
+
 ```json
 {
   "username": "andrei12323",
@@ -76,12 +85,15 @@ Login - `POST http://localhost:8080/api/login`:
 ```
 
 Overview - `GET http://localhost:8080/api/overview`:
+
 ```
 Authorization: Bearer <JWT_TOKEN_FROM_LOGIN_ABOVE>
 ```
 
 **Automated Tests:**
 Includes both unit and integration tests covering all functionality.
+
+Coverage reports can be accessed under `build/reports` after a successful build as described below.
 
 ## Build & Test
 
