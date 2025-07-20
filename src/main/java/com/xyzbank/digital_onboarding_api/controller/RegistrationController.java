@@ -45,8 +45,8 @@ public class RegistrationController {
                     content = @Content(schema = @Schema(implementation = RegistrationResponse.class)))
     })
     public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody RegistrationRequest request, BindingResult bindingResult) {
-        System.out.println("Registration endpoint hit with: " + request);
 
+        // if the body is invalid send the error message
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getFieldErrors().stream()
                     .map(error -> error.getDefaultMessage())

@@ -49,7 +49,6 @@ public class LoginController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            e.printStackTrace(); // TODO: delete
             LoginResponse errorResponse = LoginResponse.failure("Login failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
