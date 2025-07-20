@@ -79,7 +79,8 @@ public class IntegrationTestUtils {
     public static Stream<Arguments> invalidAgeCustomers() {
         return Stream.of(
                 Arguments.of("Alex Minor", "Utrecht", "alex_young", LocalDate.now().minusYears(17), Country.NL),
-                Arguments.of("Young Person", "Eindhoven", "youngperson", LocalDate.of(2010, 1, 1), Country.BE)
+                Arguments.of("Young Person", "Eindhoven", "youngperson", LocalDate.of(2010, 1, 1), Country.BE),
+                Arguments.of("Future Person", "Amsterdam", "future_person", LocalDate.now().plusYears(1), Country.NL)
         );
     }
 

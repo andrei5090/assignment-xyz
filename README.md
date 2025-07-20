@@ -16,6 +16,7 @@ Application runs on `http://localhost:8080`
 
 ## API Documentation
 
+
 *Available only when application is running or after a successful build in the build files:*
 
 - **Swagger UI OpenAPI**: http://localhost:8080/swagger-ui.html
